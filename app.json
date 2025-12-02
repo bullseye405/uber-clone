@@ -1,6 +1,6 @@
 {
   "expo": {
-   "name": "uber-clone",
+    "name": "uber-clone",
     "slug": "uber-clone",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -20,7 +20,7 @@
         "backgroundColor": "#ffffff",
         "foregroundImage": "./assets/images/adaptive-icon.png"
       },
-       "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
