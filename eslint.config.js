@@ -14,8 +14,13 @@ module.exports = defineConfig([
         {
           endOfLine: "auto",
           htmlWhitespaceSensitivity: "ignore",
+          tabWidth: 2,
+          useTabs: false,
         },
       ],
+      // Let Prettier handle indentation/spacing — disable ESLint spacing rules
+      indent: "off",
+      "no-multi-spaces": "off",
       "no-irregular-whitespace": "off",
       "react/no-unescaped-entities": "off",
     },

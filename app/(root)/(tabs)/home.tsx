@@ -1,10 +1,7 @@
-// import { SignOutButton } from "@/app/components/SignOutButton";
-import GoogleTextInput from "@/components/GoogleTextInput";
-import Map from "@/components/Map";
-import RideCard from "@/components/RideCard";
-import { icons, images } from "@/constants";
-import { recentRides } from "@/constants/recentRides";
-import { useUser } from "@clerk/clerk-expo";
+import { useAuth, useUser } from "@clerk/clerk-expo";
+import * as Location from "expo-location";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -13,21 +10,73 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { SafeAreaView } from "react-native-safe-area-context";
 
-export default function Page() {
+import GeoapifyAutocomplete from "@/components/GeoapifyAutocomplete";
+import Map from "@/components/Map";
+import RideCard from "@/components/RideCard";
+import { icons } from "@/constants";
+import { recentRides } from "@/constants/recentRides";
+import { useLocationStore } from "@/store";
+
+const Home = () => {
   const { user } = useUser();
-  const loading = true;
+  const { signOut } = useAuth();
 
-  const handleSignOut = () => {};
+  const { setUserLocation, setDestinationLocation } = useLocationStore();
 
-  const handleDestinationPress = () => {};
+  const handleSignOut = () => {
+    signOut();
+    router.replace("/(auth)/sign-in");
+  };
+
+  const [hasPermission, setHasPermission] = useState<boolean>(false);
+
+  // const {
+  //   data: recentRides,
+  //   loading,
+  //   error,
+  // } = useFetch<Ride[]>(`/(api)/ride/${user?.id}`);
+
+  useEffect(() => {
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setHasPermission(false);
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+
+      const address = await Location.reverseGeocodeAsync({
+        latitude: location.coords?.latitude!,
+        longitude: location.coords?.longitude!,
+      });
+
+      setUserLocation({
+        latitude: location.coords?.latitude,
+        longitude: location.coords?.longitude,
+        address: `${address[0].name}, ${address[0].region}`,
+      });
+    })();
+  }, [setUserLocation]);
+
+  const handleDestinationPress = (location: {
+    latitude: number;
+    longitude: number;
+    address: string;
+  }) => {
+    setDestinationLocation(location);
+
+    router.push("/(root)/find-ride");
+  };
+
   return (
-    <SafeAreaView>
+    <SafeAreaView className="bg-general-500">
       <FlatList
         data={recentRides?.slice(0, 5)}
         renderItem={({ item }) => <RideCard ride={item} />}
+        keyExtractor={(item, index) => index.toString()}
         className="px-5"
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
@@ -35,7 +84,7 @@ export default function Page() {
         }}
         ListEmptyComponent={() => (
           <View className="flex flex-col items-center justify-center">
-            {!loading ? (
+            {/* {!loading ? (
               <>
                 <Image
                   source={images.noResult}
@@ -46,18 +95,16 @@ export default function Page() {
                 <Text className="text-sm">No recent rides found</Text>
               </>
             ) : (
-              <ActivityIndicator size={"small"} color={"#000"} />
-            )}
+              <ActivityIndicator size="small" color="#000" />
+            )} */}
+            <ActivityIndicator size="small" color="#000" />
           </View>
         )}
-        ListHeaderComponent={() => (
+        ListHeaderComponent={
           <>
             <View className="flex flex-row items-center justify-between my-5">
-              <Text className="text-2xl font-JakartaExtraBold capitalize">
-                Welcome,{" "}
-                {user?.firstName ||
-                  user?.emailAddresses[0].emailAddress.split("@")[0]}{" "}
-                👋
+              <Text className="text-2xl font-JakartaExtraBold">
+                Welcome {user?.firstName}👋
               </Text>
               <TouchableOpacity
                 onPress={handleSignOut}
@@ -66,7 +113,14 @@ export default function Page() {
                 <Image source={icons.out} className="w-4 h-4" />
               </TouchableOpacity>
             </View>
-            <GoogleTextInput
+
+            {/* <GoogleTextInput
+              icon={icons.search}
+              containerStyle="bg-white shadow-md shadow-neutral-300"
+              handlePress={handleDestinationPress}
+            /> */}
+
+            <GeoapifyAutocomplete
               icon={icons.search}
               containerStyle="bg-white shadow-md shadow-neutral-300"
               handlePress={handleDestinationPress}
@@ -80,9 +134,15 @@ export default function Page() {
                 <Map />
               </View>
             </>
+
+            <Text className="text-xl font-JakartaBold mt-5 mb-3">
+              Recent Rides
+            </Text>
           </>
-        )}
+        }
       />
     </SafeAreaView>
   );
-}
+};
+
+export default Home;
