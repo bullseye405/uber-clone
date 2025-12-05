@@ -6,6 +6,7 @@ import { formatTime } from "@/lib/utils";
 import { DriverCardProps } from "@/types/type";
 
 const DriverCard = ({ item, selected, setSelected }: DriverCardProps) => {
+  if (!item) return;
   return (
     <TouchableOpacity
       onPress={setSelected}
@@ -40,9 +41,11 @@ const DriverCard = ({ item, selected, setSelected }: DriverCardProps) => {
             |
           </Text>
 
-          <Text className="text-sm font-JakartaRegular text-general-800">
-            {formatTime(item.time!)}
-          </Text>
+          {item.time && (
+            <Text className="text-sm font-JakartaRegular text-general-800">
+              {formatTime(item.time!)}
+            </Text>
+          )}
 
           <Text className="text-sm font-JakartaRegular text-general-800 mx-1">
             |

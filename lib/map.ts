@@ -119,3 +119,73 @@ export const calculateDriverTimes = async ({
     console.error("Error calculating driver times:", error);
   }
 };
+
+export const calculateDriverTimesWithGeoapify = async ({
+  markers,
+  userLatitude,
+  userLongitude,
+  destinationLatitude,
+  destinationLongitude,
+}: {
+  markers: MarkerData[];
+  userLatitude: number | null;
+  userLongitude: number | null;
+  destinationLatitude: number | null;
+  destinationLongitude: number | null;
+}) => {
+  if (
+    !userLatitude ||
+    !userLongitude ||
+    !destinationLatitude ||
+    !destinationLongitude
+  )
+    return;
+
+  const API_KEY = process.env.EXPO_PUBLIC_GEOAPIFY_API_KEY;
+
+  const getDuration = async (
+    fromLat: number,
+    fromLon: number,
+    toLat: number,
+    toLon: number,
+  ) => {
+    const url = `https://api.geoapify.com/v1/routing?waypoints=${fromLat},${fromLon}|${toLat},${toLon}&mode=drive&apiKey=${API_KEY}`;
+
+    const res = await fetch(url);
+    const json = await res.json();
+
+    return json.features[0].properties.legs[0].time ?? null; // seconds
+  };
+
+  try {
+    const timesPromises = markers.map(async (marker) => {
+      // Driver → User
+      const timeToUser = await getDuration(
+        marker.latitude,
+        marker.longitude,
+        userLatitude,
+        userLongitude,
+      );
+
+      // User → Destination
+      const timeToDestination = await getDuration(
+        userLatitude,
+        userLongitude,
+        destinationLatitude,
+        destinationLongitude,
+      );
+
+      if (!timeToUser || !timeToDestination) return null;
+
+      const totalTime = (timeToUser + timeToDestination) / 60; // minutes
+      const price = (totalTime * 0.5).toFixed(2);
+
+      return { ...marker, time: totalTime, price };
+    });
+
+    return await Promise.all(timesPromises);
+  } catch (e) {
+    console.error("Error calculating driver times:", e);
+    return null;
+  }
+};

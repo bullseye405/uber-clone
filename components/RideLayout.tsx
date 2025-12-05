@@ -4,6 +4,7 @@ import { router } from "expo-router";
 import { ReactNode, useRef } from "react";
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import Map from "./Map";
 const RideLayout = ({
   children,
@@ -16,7 +17,7 @@ const RideLayout = ({
 }) => {
   const bottomSheetRef = useRef(null);
   return (
-    <GestureHandlerRootView>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <View className="flex-1 bg-white">
         <View className="flex flex-col h-screen bg-blue-500">
           <View className="flex flex-row absolute z-10 top-16 items-center justify-start px-5">
@@ -35,7 +36,9 @@ const RideLayout = ({
           </View>
           <Map />
           <BottomSheet
-            keyboardBehavior="extend"
+            keyboardBehavior="interactive"
+            keyboardBlurBehavior="restore"
+            android_keyboardInputMode="adjustResize"
             ref={bottomSheetRef}
             snapPoints={snapPoints || ["40%", "85%"]}
             index={0}
