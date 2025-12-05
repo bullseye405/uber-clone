@@ -42,9 +42,31 @@ const Payment = ({
     }
   };
 
+  const createRide = async () => {
+    await fetchAPI("/(api)/(ride)/create", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        origin_address: userAddress,
+        destination_address: destinationAddress,
+        origin_latitude: userLatitude,
+        origin_longitude: userLongitude,
+        destination_latitude: destinationLatitude,
+        destination_longitude: destinationLongitude,
+        ride_time: rideTime.toFixed(0),
+        fare_price: parseInt(amount) * 100,
+        payment_status: "paid",
+        driver_id: driverId,
+        user_id: userId,
+      }),
+    });
+  };
+
   const initializePaymentSheet = async () => {
     const { error } = await initPaymentSheet({
-      merchantDisplayName: "Example, Inc.",
+      merchantDisplayName: "Ryde, Inc.",
       intentConfiguration: {
         mode: {
           amount: parseInt(amount) * 100,
@@ -85,25 +107,7 @@ const Payment = ({
               }),
             });
             if (result.client_secret) {
-              await fetchAPI("/(api)/ride/create", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                  origin_address: userAddress,
-                  destination_address: destinationAddress,
-                  origin_latitude: userLatitude,
-                  origin_longitude: userLongitude,
-                  destination_latitude: destinationLatitude,
-                  destination_longitude: destinationLongitude,
-                  ride_time: rideTime.toFixed(0),
-                  fare_price: parseInt(amount) * 100,
-                  payment_status: "paid",
-                  driver_id: driverId,
-                  user_id: userId,
-                }),
-              });
+              await createRide();
               intentCreationCallback({
                 clientSecret: result.client_secret,
               });
@@ -111,7 +115,7 @@ const Payment = ({
           }
         },
       },
-      // returnURL: "myapp://book-ride",
+      returnURL: "uberclone://book-ride",
     });
 
     if (!error) {
