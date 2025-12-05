@@ -15,9 +15,9 @@ const SignUp = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [form, setForm] = useState({
-    name: "tomato",
-    email: "tomato@yopmail.com",
-    password: "8wC0h91RcOYl^628",
+    name: "",
+    email: "",
+    password: "",
   });
   const [verification, setVerification] = useState({
     state: "default",
