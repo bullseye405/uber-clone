@@ -15,9 +15,10 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import GeoapifyAutocomplete from "@/components/GeoapifyAutocomplete";
 import Map from "@/components/Map";
 import RideCard from "@/components/RideCard";
-import { icons } from "@/constants";
-import { recentRides } from "@/constants/recentRides";
+import { icons, images } from "@/constants";
+import { useFetch } from "@/lib/fetch";
 import { useLocationStore } from "@/store";
+import { Ride } from "@/types/type";
 
 const Home = () => {
   const { user } = useUser();
@@ -25,18 +26,13 @@ const Home = () => {
 
   const { setUserLocation, setDestinationLocation } = useLocationStore();
 
-  const handleSignOut = () => {
-    signOut();
-    router.replace("/(auth)/sign-in");
-  };
-
   const [hasPermission, setHasPermission] = useState<boolean>(false);
 
-  // const {
-  //   data: recentRides,
-  //   loading,
-  //   error,
-  // } = useFetch<Ride[]>(`/(api)/ride/${user?.id}`);
+  const {
+    data: recentRides,
+    loading,
+    error,
+  } = useFetch<Ride[]>(`/(api)/(ride)/${user?.id}`);
 
   useEffect(() => {
     (async () => {
@@ -71,6 +67,11 @@ const Home = () => {
     router.push("/(root)/find-ride");
   };
 
+  const handleSignOut = () => {
+    signOut();
+    router.replace("/(auth)/sign-in");
+  };
+
   return (
     <SafeAreaView className="bg-general-500">
       <FlatList
@@ -84,7 +85,7 @@ const Home = () => {
         }}
         ListEmptyComponent={() => (
           <View className="flex flex-col items-center justify-center">
-            {/* {!loading ? (
+            {!loading ? (
               <>
                 <Image
                   source={images.noResult}
@@ -96,8 +97,7 @@ const Home = () => {
               </>
             ) : (
               <ActivityIndicator size="small" color="#000" />
-            )} */}
-            <ActivityIndicator size="small" color="#000" />
+            )}
           </View>
         )}
         ListHeaderComponent={

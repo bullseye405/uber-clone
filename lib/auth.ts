@@ -1,3 +1,4 @@
+import { StartSSOFlowParams, StartSSOFlowReturnType } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import * as SecureStore from "expo-secure-store";
 import { fetchAPI } from "./fetch";
@@ -27,17 +28,22 @@ export const tokenCache = {
   },
 };
 
-export const googleOAuth = async (startOAuthFlow: any) => {
+export const googleOAuth = async (
+  startOAuthFlow: (
+    startSSOFlowParams: StartSSOFlowParams,
+  ) => Promise<StartSSOFlowReturnType>,
+) => {
   try {
     const { createdSessionId, setActive, signUp } = await startOAuthFlow({
       redirectUrl: Linking.createURL("/(root)/(tabs)/home"),
+      strategy: "oauth_google",
     });
 
     if (createdSessionId) {
       if (setActive) {
         await setActive({ session: createdSessionId });
 
-        if (signUp.createdUserId) {
+        if (signUp?.createdUserId) {
           await fetchAPI("/(api)/user", {
             method: "POST",
             body: JSON.stringify({
