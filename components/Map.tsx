@@ -9,7 +9,7 @@ import { useDriverStore, useLocationStore } from "@/store";
 import { GeoapifyResponse } from "@/types/geoapify";
 import { Driver, MarkerData } from "@/types/type";
 import { useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Text, View } from "react-native";
+import { ActivityIndicator, Platform, Text, View } from "react-native";
 import MapView, { Marker, Polyline, PROVIDER_DEFAULT } from "react-native-maps";
 
 const Map = () => {
@@ -119,7 +119,7 @@ const Map = () => {
       provider={PROVIDER_DEFAULT}
       className="w-full h-full"
       tintColor="black"
-      mapType="mutedStandard"
+      mapType={Platform.OS === "ios" ? "mutedStandard" : "standard"}
       showsPointsOfInterest={false}
       initialRegion={region}
       showsUserLocation={true}
