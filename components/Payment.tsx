@@ -69,7 +69,7 @@ const Payment = ({
       merchantDisplayName: "Ryde, Inc.",
       intentConfiguration: {
         mode: {
-          amount: parseInt(amount) * 100,
+          amount: parseFloat(amount) * 100,
           currencyCode: "usd",
         },
 

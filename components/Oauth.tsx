@@ -1,4 +1,4 @@
-import { Image, Text, View } from "react-native";
+import { Alert, Image, Text, View } from "react-native";
 
 import CustomButton from "@/components/CustomButton";
 import { icons } from "@/constants";
@@ -12,9 +12,10 @@ const OAuth = () => {
 
   const handleGoogleSignIn = useCallback(async () => {
     const result = await googleOAuth(startSSOFlow);
-
     if (result.success) {
       router.replace("/(root)/(tabs)/home");
+    } else {
+      Alert.alert(result.message);
     }
   }, [startSSOFlow]);
 

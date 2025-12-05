@@ -67,11 +67,14 @@ export const googleOAuth = async (
       message: "An error occurred while signing in with Google",
     };
   } catch (err: any) {
-    console.error(err);
+    const message =
+      Array.isArray(err?.errors) && err.errors[0]?.message?.longMessage
+        ? err.errors[0]?.message?.longMessage
+        : "Something went wrong";
     return {
       success: false,
       code: err.code,
-      message: err?.errors[0]?.longMessage,
+      message: message,
     };
   }
 };

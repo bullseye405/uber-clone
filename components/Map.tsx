@@ -70,14 +70,8 @@ const Map = () => {
         setDrivers(drivers as MarkerData[]);
       });
     }
-  }, [
-    markers,
-    destinationLatitude,
-    destinationLongitude,
-    userLatitude,
-    userLongitude,
-    setDrivers,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [markers, destinationLatitude, destinationLongitude]);
 
   useEffect(() => {
     if (
